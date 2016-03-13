@@ -112,6 +112,15 @@ module.exports = yeoman.generators.Base.extend({
         modulenameLower: this.modulenameLower,
         classes : this.classes}
     );
+    // Copy config.xml
+    this.fs.copyTpl(
+      this.templatePath('config.xml'),
+      this.destinationPath('src/config.xml'),
+      {
+        props: this.props,
+        modulenameLower: this.modulenameLower,
+      }
+    );
     // Create classes
     if(this.props.createClass) {
       for (var i = 0; i < this.classes.length; i++) {
@@ -159,9 +168,15 @@ module.exports = yeoman.generators.Base.extend({
         }
       );
     }
+
+    // copy assets
+    this.fs.copy(this.templatePath('logo.gif'), this.destinationPath('src/logo.gif'));
+    this.fs.copy(this.templatePath('logo.png'), this.destinationPath('src/logo.png'));
+
   },
 
   install: function () {
-    this.installDependencies();
+    //this.installDependencies();
+    // no dependencies yet for a base prestamodule
   }
 });
