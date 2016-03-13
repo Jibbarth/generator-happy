@@ -172,6 +172,7 @@ module.exports = yeoman.generators.Base.extend({
     // copy assets
     this.fs.copy(this.templatePath('logo.gif'), this.destinationPath('src/logo.gif'));
     this.fs.copy(this.templatePath('logo.png'), this.destinationPath('src/logo.png'));
+    this.fs.copy(this.templatePath('index.php'), this.destinationPath('src/index.php'));
 
   },
 
