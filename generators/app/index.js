@@ -14,106 +14,36 @@ module.exports = yeoman.generators.Base.extend({
       'Welcome to the laudable ' + chalk.red('generator-happy') + ' generator!'
     ));
 
-    var prompts = [{
-      type: 'input',
-      name: 'moduleName',
-      message:'Your prestashop module name',
-      default: this.appname
-    },
-    {
-      type: 'input',
-      name: 'moduleDesc',
-      message:'Your prestashop module description',
-    },
-    {
-      type: 'input',
-      name: 'author',
-      message:'Your author name',
-    },
-    {
-      type: 'confirm',
-      name:"createClass",
-      message:"Do you want some class ?",
-      default: false,
-    }
+    var subgeneratorList = [
+        'prestamodule',
+        'prestasite'
     ];
+    var prompts = [{
+      type: 'list',
+      name: 'subgenerator',
+      message:'What do you want to do ?',
+      default: 0,
+      choices: subgeneratorList,
+    }];
 
     this.prompt(prompts, function (props) {
       this.props = props;
+
       // To access props later use this.props.moduleName;
-      this.ModuleNameClass = _s.classify(this.props.moduleName);
-      this.modulenameLower = this.ModuleNameClass.toLowerCase();
-      this.classes = [];
-      if(this.props.createClass) {
-        this._askClasses();
-      } else {
-        done();
-      }
+      done();
     }.bind(this));
   },
-  _askForClass: function(){
-    var done = this.async();
-    var prompt = [{
-      type:'confirm',
-      name: 'otherClass',
-      message:'Do you want add another class ?',
-      default: false,
-    }];
-    this.prompt(prompt, function(props) {
-      if(props.otherClass == true) {
-        this._askClasses();
-      } else {
-        done();
+  main: function(){
+    this.log(this.props.subgenerator);
+    this.composeWith("happy:"+this.props.subgenerator, {
+      options: {
+        nested: true,
+        appName: this.appName
       }
-    }.bind(this));
-
+    }, {
+      local: require.resolve("./../"+this.props.subgenerator)
+    });
   },
-  _askClasses: function(){
-    var done = this.async();
-    // Have Yeoman greet the user.
-    var prompts = [{
-      type: 'input',
-      name: 'className',
-      message:'What is your className ?',
-    },
-    ];
-
-    this.prompt(prompts, function (props) {
-      if(props.className != "") {
-        this.classes.push(props.className);
-        this._askForClass();
-      } else {
-        done();
-      }
-    }.bind(this));
-  },
-
-  writing: function () {
-    this.log(this.classes);
-    // Copy modulename.php
-    this.fs.copyTpl(
-      this.templatePath('modulename.php'),
-      this.destinationPath('src/'+this.modulenameLower+'.php'),
-      {moduleName : this.ModuleNameClass,
-        props: this.props,
-        modulenameLower: this.modulenameLower,
-        classes : this.classes}
-    );
-    if(this.props.createClass) {
-      for (var i = 0; i < this.classes.length; i++) {
-        this.fs.copyTpl(
-          this.templatePath('classes/ModuleNameEntity.php'),
-          this.destinationPath('src/classes/'+_s.classify(this.classes[i])+'.php'),
-          {
-            entityName : _s.classify(this.classes[i]),
-            entityNameUnderscored: _s.underscored(this.classes[i])
-          }
-        );
-      }
-    }
-
-  },
-
   install: function () {
     this.installDependencies();
   }
