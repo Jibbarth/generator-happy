@@ -1,5 +1,7 @@
 # generator-happy [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
-> Build happy project
+
+:metal: Yeoman Generator for Team Happy to easily start a new project
+
 
 ## Installation
 
@@ -7,7 +9,11 @@ First, install [Yeoman](http://yeoman.io) and generator-happy using [npm](https:
 
 ```bash
 npm install -g yo
-npm install -g generator-happy
+```
+
+Then, clone this repo (until i publish it on npm) and
+```
+npm link
 ```
 
 Then generate your new project:
