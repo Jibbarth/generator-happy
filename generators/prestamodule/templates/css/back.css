@@ -1,0 +1,15 @@
+#confirm_message, #error_message {
+    position: fixed;
+    z-index: 999;
+    left: 50%;
+    top: 20%;
+    box-shadow: 4px 4px 10px #AAAAAA;
+    display: none;
+    transform-origin: 0;
+
+    transform: translate(-50%, 0);
+    -webkit-transform: translate(-50%, 0);
+    -moz-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
+    -o-transform: translate(-50%, 0);
+}

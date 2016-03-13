@@ -31,6 +31,18 @@ module.exports = yeoman.generators.Base.extend({
       message:'Your author name',
     },
     {
+      type:'confirm',
+      name:'adminModuleControllerRequired',
+      message: 'Do you want an Admin module controller ?',
+      default: true,
+    },
+    {
+      type:'confirm',
+      name:'testRequired',
+      message: 'Do you plan to make test with TestSuite ? '+ chalk.yellow('(you should do...)'),
+      default: true,
+    },
+    {
       type: 'confirm',
       name:"createClass",
       message:"Do you want some class ?",
@@ -43,6 +55,7 @@ module.exports = yeoman.generators.Base.extend({
       // To access props later use this.props.moduleName;
       this.ModuleNameClass = _s.classify(this.props.moduleName);
       this.modulenameLower = this.ModuleNameClass.toLowerCase();
+      this.modulenameCapitalized = _s.capitalize(this.modulenameLower);
       this.classes = [];
       if(this.props.createClass) {
         this._askClasses();
@@ -99,6 +112,7 @@ module.exports = yeoman.generators.Base.extend({
         modulenameLower: this.modulenameLower,
         classes : this.classes}
     );
+    // Create classes
     if(this.props.createClass) {
       for (var i = 0; i < this.classes.length; i++) {
         this.fs.copyTpl(
@@ -112,6 +126,39 @@ module.exports = yeoman.generators.Base.extend({
       }
     }
 
+    // Create adminModuleController
+    if(this.props.adminModuleControllerRequired) {
+      this.fs.copyTpl(
+        this.templatePath('controllers/admin/AdminModulenameController.php'),
+        this.destinationPath('src/controllers/admin/Admin'+this.modulenameCapitalized+'.php'),
+        {moduleNameCapitalized: this.modulenameCapitalized}
+      );
+      this.fs.copyTpl(
+        this.templatePath('views'),
+        this.destinationPath('src/views'),
+        {
+          modulenameLower : this.modulenameLower,
+          modulenameUnderscored: _s.underscored(this.ModuleNameClass),
+        }
+      );
+    }
+
+    // Copy css
+    this.fs.copy(this.templatePath('css'), this.destinationPath('src/css'));
+    // Copy js
+    this.fs.copy(this.templatePath('js'), this.destinationPath('src/js'));
+
+    // copy Test
+    if (this.props.testRequired) {
+      this.fs.copy(
+        this.templatePath('tests/ModuleNameTest.php'),
+        this.destinationPath('src/tests/'+this.ModuleNameClass+'.php'),
+        {
+          moduleName: this.ModuleNameClass,
+          modulenameLower: this.modulenameLower,
+        }
+      );
+    }
   },
 
   install: function () {
