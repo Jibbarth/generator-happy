@@ -28,10 +28,12 @@ class <%= moduleName %> extends Module
         $this->confirmUninstall = $this->l(
             'Are you sure you want to uninstall? You will lose all your settings.'
         );
-<% if (props.createClass) { %>
-        require_once('classes/ModuleNameEntity.php');
-<% } %>
-    }
+<% if (props.createClass) {
+    for (var i=0; i < classes.length ; i++) {    %>
+        require_once('classes/<%= classes[i] %>.php'); <%
+    } //endfor
+} //endif
+%>
 
     /**
      * Install the module.

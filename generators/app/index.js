@@ -43,31 +43,74 @@ module.exports = yeoman.generators.Base.extend({
       // To access props later use this.props.moduleName;
       this.ModuleNameClass = _s.classify(this.props.moduleName);
       this.modulenameLower = this.ModuleNameClass.toLowerCase();
+      this.classes = [];
+      if(this.props.createClass) {
+        this._askClasses();
+      } else {
+        done();
+      }
+    }.bind(this));
+  },
+  _askForClass: function(){
+    var done = this.async();
+    var prompt = [{
+      type:'confirm',
+      name: 'otherClass',
+      message:'Do you want add another class ?',
+      default: false,
+    }];
+    this.prompt(prompt, function(props) {
+      if(props.otherClass == true) {
+        this._askClasses();
+      } else {
+        done();
+      }
+    }.bind(this));
 
-      done();
+  },
+  _askClasses: function(){
+    var done = this.async();
+    // Have Yeoman greet the user.
+    var prompts = [{
+      type: 'input',
+      name: 'className',
+      message:'What is your className ?',
+    },
+    ];
+
+    this.prompt(prompts, function (props) {
+      if(props.className != "") {
+        this.classes.push(props.className);
+        this._askForClass();
+      } else {
+        done();
+      }
     }.bind(this));
   },
 
   writing: function () {
-    /*this.mkdir('src');
-    this.mkdir('src/classes');
-    this.mkdir('src/controllers');
-    this.mkdir('src/controllers/admin');
-    this.mkdir('src/controllers/front');
-    this.mkdir('src/css');
-    this.mkdir('src/js');
-    this.mkdir('src/test');
-    this.mkdir('src/views');
-    this.mkdir('src/views/templates');
-    this.mkdir('src/views/templates/admin');*/
+    this.log(this.classes);
     // Copy modulename.php
     this.fs.copyTpl(
       this.templatePath('modulename.php'),
       this.destinationPath('src/'+this.modulenameLower+'.php'),
       {moduleName : this.ModuleNameClass,
         props: this.props,
-        modulenameLower: this.modulenameLower}
+        modulenameLower: this.modulenameLower,
+        classes : this.classes}
     );
+    if(this.props.createClass) {
+      for (var i = 0; i < this.classes.length; i++) {
+        this.fs.copyTpl(
+          this.templatePath('classes/ModuleNameEntity.php'),
+          this.destinationPath('src/classes/'+_s.classify(this.classes[i])+'.php'),
+          {
+            entityName : _s.classify(this.classes[i]),
+            entityNameUnderscored: _s.underscored(this.classes[i])
+          }
+        );
+      }
+    }
 
   },
 
