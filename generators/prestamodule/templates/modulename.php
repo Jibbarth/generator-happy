@@ -43,7 +43,12 @@ class <%= moduleName %> extends Module
     public function install()
     {
         $bReturn = parent::install();
-        $bReturn = $bReturn && ModuleNameEntity::install();
+<% if (props.createClass) {
+    for (var i=0; i < classes.length ; i++) {    %>
+        $bReturn = $bReturn && <%= classes[i]%>::install();  <%
+    } //endfor
+} //endif
+%>
         $bReturn = $bReturn && $this->installModuleTab(
             'AdminModulename',
             array(

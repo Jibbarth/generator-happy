@@ -80,7 +80,7 @@ module.exports = yeoman.generators.Base.extend({
 
     this.prompt(prompts, function (props) {
       if(props.className != "") {
-        this.classes.push(props.className);
+        this.classes.push(_s.classify(props.className));
         this._askForClass();
       } else {
         done();
