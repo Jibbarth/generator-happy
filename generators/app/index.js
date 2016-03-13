@@ -10,13 +10,13 @@ module.exports = yeoman.generators.Base.extend({
     var done = this.async();
 
     // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the laudable ' + chalk.red('generator-happy') + ' generator!'
-    ));
+    //
+    this.log(chalk.green('           \n        ###    \n      #######  \n     ######### \n     ## ### ## \n    ### ### ###\n    ### ### ###\n    ###########\n      #######  \n        ####   \n               \n    '));
 
     var subgeneratorList = [
-        'prestamodule',
-        'prestasite'
+      {name:"An awesome prestashop module", value:'prestamodule'},
+      {name:"Start a new prestashop project "+ chalk.yellow('- this is not yet available, submit a PR -'), value:'prestasite'},
+      {name:"Construct an awesome build.xml for ant tasks", value:'ant-build'},
     ];
     var prompts = [{
       type: 'list',
@@ -45,6 +45,8 @@ module.exports = yeoman.generators.Base.extend({
     });
   },
   install: function () {
-    this.installDependencies();
+    //this.installDependencies();
+    //
+    //On this switcher, no dependencies required.
   }
 });
