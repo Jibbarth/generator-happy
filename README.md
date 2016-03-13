@@ -1,4 +1,5 @@
-# generator-happy [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-happy [![NPM version][npm-image]][npm-url] 
+##### *Not published yet on npm*
 
 :metal: Yeoman Generator for Team Happy to easily start a new project
 
