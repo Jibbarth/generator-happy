@@ -19,15 +19,31 @@ module.exports = yeoman.generators.Base.extend({
       {name:"Ant build for Symfony", value:'symfony'},
       {name:"Ant build for Haxe project", value:'haxe'},
     ];
+
+    var subBuildProperties = [
+        {name: "Local", value :'local', checked:true},
+        {name: "Preprod", value :'preprod', checked:true},
+        {name: "Prod", value :'prod', checked:false},
+    ]
     var prompts = [{
-      type: 'list',
-      name: 'antChoice',
-      message:'What kind of build.xml you want',
-      default: 0,
-      choices: subTypeAnt,
-    }];
+        type: 'list',
+        name: 'antChoice',
+        message:'What kind of build.xml you want',
+        default: 0,
+        choices: subTypeAnt,
+    },
+    {
+        type:'checkbox',
+        name:'buildproperties',
+        message: 'What kind of build.properties do you want ?',
+        choices: subBuildProperties,
+    }
+    ];
 
     this.prompt(prompts, function (props) {
+      this.antType = props.antChoice;
+      this.propertiesWanted = props.buildproperties;
+      this.log(props.buildproperties);
       this["_ask_"+props.antChoice]();
       //this.props = props;
       // To access props later use this.props.someOption;
