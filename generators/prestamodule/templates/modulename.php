@@ -52,9 +52,9 @@ class <%= moduleName %> extends Module
 %>
 <% if (props.adminModuleControllerRequired) { %>
         $bReturn = $bReturn && $this->installModuleTab(
-            'Admin'+ moduleNameCapitalized,
+            'Admin<%= moduleNameCapitalized %>',
             array(
-                1 => props.moduleName + ' - Administration',
+                1 => '<%=props.moduleName %> - Administration',
             ),
             10
         );
@@ -77,7 +77,7 @@ class <%= moduleName %> extends Module
 } //endif
 %>
 <% if (props.adminModuleControllerRequired) { %>
-        $bReturn = $bReturn && $this->uninstallModuleTab('Admin'+ moduleNameCapitalized);
+        $bReturn = $bReturn && $this->uninstallModuleTab('Admin<%=moduleNameCapitalized%>');
 <% } %>
 
         return $bReturn;
