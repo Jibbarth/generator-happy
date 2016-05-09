@@ -110,7 +110,8 @@ module.exports = yeoman.generators.Base.extend({
       {moduleName : this.ModuleNameClass,
         props: this.props,
         modulenameLower: this.modulenameLower,
-        classes : this.classes}
+        classes : this.classes,
+        moduleNameCapitalized: this.modulenameCapitalized}
     );
     // Copy config.xml
     this.fs.copyTpl(

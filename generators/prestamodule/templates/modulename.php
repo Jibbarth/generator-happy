@@ -50,14 +50,15 @@ class <%= moduleName %> extends Module
     } //endfor
 } //endif
 %>
+<% if (props.adminModuleControllerRequired) { %>
         $bReturn = $bReturn && $this->installModuleTab(
-            'AdminModulename',
+            'Admin'+ moduleNameCapitalized,
             array(
-                1 => 'Module Name - Tab Title',
+                1 => props.moduleName + ' - Administration',
             ),
             10
         );
-
+<% } %>
         return $bReturn;
     }
 
@@ -75,7 +76,9 @@ class <%= moduleName %> extends Module
     } //endfor
 } //endif
 %>
-        $bReturn = $bReturn && $this->uninstallModuleTab('AdminModulename');
+<% if (props.adminModuleControllerRequired) { %>
+        $bReturn = $bReturn && $this->uninstallModuleTab('Admin'+ moduleNameCapitalized);
+<% } %>
 
         return $bReturn;
     }
