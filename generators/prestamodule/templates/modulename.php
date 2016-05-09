@@ -34,6 +34,7 @@ class <%= moduleName %> extends Module
     } //endfor
 } //endif
 %>
+    }
 
     /**
      * Install the module.

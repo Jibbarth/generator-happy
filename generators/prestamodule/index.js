@@ -11,7 +11,7 @@ module.exports = yeoman.generators.Base.extend({
 
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the laudable ' + chalk.red('generator-happy') + ' generator!'
+      'Welcome to the wonderfull ' + chalk.red('generator-happy') + ' generator for prestashop modules !'
     ));
 
     var prompts = [{
