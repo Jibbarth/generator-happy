@@ -159,11 +159,11 @@ module.exports = yeoman.generators.Base.extend({
 
     // copy Test
     if (this.props.testRequired) {
-      this.fs.copy(
+      this.fs.copyTpl(
         this.templatePath('tests/ModuleNameTest.php'),
-        this.destinationPath('src/tests/'+this.ModuleNameClass+'.php'),
+        this.destinationPath('src/tests/'+this.ModuleNameClass+'Test.php'),
         {
-          moduleName: this.ModuleNameClass,
+          ModuleName: this.ModuleNameClass,
           modulenameLower: this.modulenameLower,
         }
       );
