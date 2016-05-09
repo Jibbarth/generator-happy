@@ -69,7 +69,12 @@ class <%= moduleName %> extends Module
     public function uninstall()
     {
         $bReturn = parent::uninstall();
-        $bReturn = $bReturn && ModuleNameEntity::uninstall();
+<% if (props.createClass) {
+    for (var i=0; i < classes.length ; i++) {    %>
+        $bReturn = $bReturn && <%= classes[i]%>::uninstall();  <%
+    } //endfor
+} //endif
+%>
         $bReturn = $bReturn && $this->uninstallModuleTab('AdminModulename');
 
         return $bReturn;
