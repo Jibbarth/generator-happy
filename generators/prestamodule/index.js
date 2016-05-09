@@ -142,15 +142,15 @@ module.exports = yeoman.generators.Base.extend({
         this.destinationPath('src/controllers/admin/Admin'+this.modulenameCapitalized+'.php'),
         {moduleNameCapitalized: this.modulenameCapitalized}
       );
-      this.fs.copyTpl(
-        this.templatePath('views'),
-        this.destinationPath('src/views'),
-        {
-          modulenameLower : this.modulenameLower,
-          modulenameUnderscored: _s.underscored(this.ModuleNameClass),
-        }
-      );
     }
+    this.fs.copyTpl(
+      this.templatePath('views'),
+      this.destinationPath('src/views'),
+      {
+        modulenameLower : this.modulenameLower,
+        modulenameUnderscored: _s.underscored(this.ModuleNameClass),
+      }
+    );
 
     // Copy css
     this.fs.copy(this.templatePath('css'), this.destinationPath('src/css'));
