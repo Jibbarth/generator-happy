@@ -2,18 +2,18 @@
 var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
-
+var async = require('async');
 
 module.exports = yeoman.generators.Base.extend({
   prompting: function () {
     var done = this.async();
-
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the impeccable ' + chalk.red('generator-happy') + ' generator!'
     ));
 
     var subTypeAnt = [
+      {name:"Base Ant build", value:'default'},
       {name:"Ant build for prestashop", value:'prestashop'},
       {name:"Ant build for prestamodule", value:'prestamodule'},
       {name:"Ant build for Symfony", value:'symfony'},
@@ -23,7 +23,8 @@ module.exports = yeoman.generators.Base.extend({
     var subBuildProperties = [
         {name: "Local", value :'local', checked:true},
         {name: "Preprod", value :'preprod', checked:true},
-        {name: "Prod", value :'prod', checked:false},
+        {name: "Recette", value :'recette', checked:false},
+        {name: "Prod", value :'prod', checked:true},
     ]
     var prompts = [{
         type: 'list',
@@ -43,12 +44,52 @@ module.exports = yeoman.generators.Base.extend({
     this.prompt(prompts, function (props) {
       this.antType = props.antChoice;
       this.propertiesWanted = props.buildproperties;
-      this.log(props.buildproperties);
-      this["_ask_"+props.antChoice]();
-      //this.props = props;
-      // To access props later use this.props.someOption;
+      this.log(chalk.blue('\n\nOkay. I guess you use ssh for deploy in your differents environment so..'));
+      this.buildproperties = [];
+      this._ask_build_env(this.propertiesWanted, 0);
+      //this["_ask_"+props.antChoice]();
 
-      done();
+    }.bind(this));
+  },
+  _ask_build_env: function(array, current) {
+    var done = this.async();
+    var env = array[current];
+    this.log('\n\n Some questions about your ' + chalk.yellow(env));
+    var prompts = [
+      {
+        type: 'input',
+        name: 'Host',
+        message:'What is host url for ' + env + ' ? ',
+        default: '127.0.0.1'
+      },
+      {
+        type: 'input',
+        name: 'User',
+        message:'What is user for ' + env + ' ? ',
+        default: 'happy'
+      },
+      {
+        type: 'password',
+        name: 'Password',
+        message:'What is password for ' + env + ' ? ',
+        default: '******'
+      },
+      {
+        type: 'input',
+        name: 'ExecutionFolder',
+        message:'What is remote folder for ' + env + ' ? ',
+        default: '/var/www/html'
+      },
+    ];
+
+    this.prompt(prompts, function (props) {
+      this.buildproperties[env] = props;
+      current++;
+      if(array.length == current) {
+        done();
+      } else {
+        this._ask_build_env(array, current);
+      }
     }.bind(this));
   },
 
@@ -67,10 +108,23 @@ module.exports = yeoman.generators.Base.extend({
     this.log("Let's go for haxe ant build");
   },
   writing: function () {
-    // this.fs.copy(
-    //   this.templatePath('dummyfile.txt'),
-    //   this.destinationPath('dummyfile.txt')
-    // );
+    this.fs.copy(
+       this.templatePath('dummyfile.txt'),
+       this.destinationPath('dummyfile.txt')
+    );
+
+    if(this.propertiesWanted.length > 0) {
+      for (var i = 0; i < this.propertiesWanted.length; i++) {
+        this.fs.copyTpl(
+          this.templatePath('build.properties.env'),
+          this.destinationPath('build.properties.'+this.propertiesWanted[i]),
+          {
+            env : this.propertiesWanted[i],
+            envValue: this.buildproperties[this.propertiesWanted[i]],
+          }
+        );
+      }
+    }
   },
 
   install: function () {
