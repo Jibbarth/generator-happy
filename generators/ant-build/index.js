@@ -8,14 +8,13 @@ module.exports = yeoman.generators.Base.extend({
   prompting: function () {
     var done = this.async();
     // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the impeccable ' + chalk.red('generator-happy') + ' generator!'
+    this.log((
+      '\n\nWelcome to the impeccable ' + chalk.red('generator-happy') + ' for ant build ! \n\n'
     ));
 
     var subTypeAnt = [
       {name:"Base Ant build", value:'default'},
       {name:"Ant build for prestashop", value:'prestashop'},
-      //{name:"Ant build for prestamodule", value:'prestamodule'},
       {name:"Ant build for Symfony", value:'symfony'},
       //{name:"Ant build for Haxe project", value:'haxe'},
     ];
@@ -164,18 +163,8 @@ module.exports = yeoman.generators.Base.extend({
         done();
     }.bind(this));
   },
-  _ask_prestashop: function(){
-    this.log("Let's go for prestashop ant build");
-  },
-  _ask_prestamodule: function(){
-    this.log("Let's go for prestashop module ant build");
-
-  },
-  _ask_symfony: function(){
-    this.log("Let's go for symfony ant build");
-
-  },
   _ask_haxe:function(){
+    // TODO:
     this.log("Let's go for haxe ant build");
   },
   writing: function () {
@@ -198,6 +187,16 @@ module.exports = yeoman.generators.Base.extend({
       }
     }
 
+    // COPY BUILD.PROPERTIES
+    this.fs.copyTpl(
+      this.templatePath('build.properties'),
+      this.destinationPath('build.properties'),
+      {
+        props: this.globalProperties,
+        type: this.antType,
+      }
+    );
+
     // COPY BUILD.XML
     this.fs.copyTpl(
       this.templatePath('build.xml'),
@@ -209,12 +208,12 @@ module.exports = yeoman.generators.Base.extend({
         useVm: this.useVm,
       }
     );
-    // COPY BUILD.PROPERTIES
+    // COPY COMMON.BUILD.XML
     this.fs.copyTpl(
-      this.templatePath('build.properties'),
-      this.destinationPath('build.properties'),
+      this.templatePath('common.build.xml'),
+      this.destinationPath('common.build.xml'),
       {
-        props: this.globalProperties,
+        branchVerification: this.branchVerification,
         type: this.antType,
       }
     );
