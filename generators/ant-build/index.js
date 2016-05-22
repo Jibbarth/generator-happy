@@ -110,13 +110,49 @@ module.exports = yeoman.generators.Base.extend({
       this.buildproperties[env] = props;
       current++;
       if(array.length == current) {
-        done();
+        //done();
+        this._ask_global_properties();
       } else {
         this._ask_build_env(array, current);
       }
     }.bind(this));
   },
+  _ask_global_properties: function(){
+    var done = this.async();
+    this.log('\n\n Some questions about your global build.properties');
 
+    var prompts = [
+      {
+        type: 'input',
+        name: 'out',
+        message:'What is your deploy directory ? '+ chalk.yellow('- the folder sync with your vm -'),
+        default: '${basedir}/out'
+      },
+      {
+        type: 'input',
+        name: 'src',
+        message:'What is your source directory ? ',
+        default: '${basedir}/src'
+      },
+      {
+        type: 'input',
+        name: 'archiveFileName',
+        message:'Do you have a preference to name the deployment archive ? ',
+        default: 'site'
+      },
+      {
+        type: 'confirm',
+        name: 'bAntVersion',
+        message:'Is your ant version is higher than the 1.9 ? ',
+        default: true
+      },
+    ];
+
+    this.prompt(prompts, function (props) {
+        this.globalProperties = props;
+        done();
+    }.bind(this));
+  },
   _ask_prestashop: function(){
     this.log("Let's go for prestashop ant build");
   },
@@ -158,6 +194,14 @@ module.exports = yeoman.generators.Base.extend({
       {
         projectName: this.projectName,
         branchVerification: this.branchVerification,
+      }
+    );
+    // COPY BUILD.PROPERTIES
+    this.fs.copyTpl(
+      this.templatePath('build.properties'),
+      this.destinationPath('build.properties'),
+      {
+        props: this.globalProperties,
       }
     );
   },
