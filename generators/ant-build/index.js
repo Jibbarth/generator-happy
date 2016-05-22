@@ -206,6 +206,7 @@ module.exports = yeoman.generators.Base.extend({
         branchVerification: this.branchVerification,
         type: this.antType,
         useVm: this.useVm,
+        aEnv: this.propertiesWanted,
       }
     );
     // COPY COMMON.BUILD.XML
@@ -220,6 +221,6 @@ module.exports = yeoman.generators.Base.extend({
   },
 
   install: function () {
-    this.installDependencies();
+    //this.installDependencies();
   }
 });
