@@ -106,15 +106,26 @@ module.exports = yeoman.generators.Base.extend({
         });
     }
 
+    if (env == 'local') {
+        prompts.push({
+            type:'confirm',
+            name:'vmUse',
+            message: 'Do you use Virtual Machine ?',
+            default: true
+        });
+    }
+
     this.prompt(prompts, function (props) {
-      this.buildproperties[env] = props;
-      current++;
-      if(array.length == current) {
-        //done();
-        this._ask_global_properties();
-      } else {
-        this._ask_build_env(array, current);
-      }
+        this.buildproperties[env] = props;
+        if (env == 'local') {
+            this.useVm = props.vmUse;
+        }
+        current++;
+        if(array.length == current) {
+            this._ask_global_properties();
+        } else {
+            this._ask_build_env(array, current);
+        }
     }.bind(this));
   },
   _ask_global_properties: function(){
@@ -195,6 +206,7 @@ module.exports = yeoman.generators.Base.extend({
         projectName: this.projectName,
         branchVerification: this.branchVerification,
         type: this.antType,
+        useVm: this.useVm,
       }
     );
     // COPY BUILD.PROPERTIES

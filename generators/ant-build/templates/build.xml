@@ -29,7 +29,7 @@
         <antcall target="upload-1.9"/>
         <antcall target="remove-package"/>
         <antcall target="unpack"/>
-        <antcall target="delete-package"/>
+        <antcall target="delete-remote-package"/>
         <% if (type == 'prestashop') { %><antcall target="remove-cache-prestashop" /><% } %>
 
     </target>
@@ -40,14 +40,18 @@
         <copy todir="${deployDir}" overwrite="false" preservelastmodified="true">
             <fileset dir="${basedir}/src">
                 <include name="**/*"/>
-                <exclude name="site.tar.gz"/>
+                <exclude name="${archiveFilename}"/>
             </fileset>
         </copy>
+    <% if (useVm) { %>
         <condition property="isVm">
             <isreachable url="http://${Host}" timeout="2"/>
         </condition>
         <fail message="You don't use vm or it's not launched." unless="isVm"/>
+        <!-- TODO : Check vboxmanage list runningvm to have now which vm is launched -->
         <antcall target="sync-vm"></antcall>
+    <% } %>
+        <% if (type == 'prestashop') { %><antcall target="remove-cache-prestashop" /><% } %>
     </target>
 
     <target name="deploy-preprod">
@@ -71,7 +75,7 @@
 
     <target name="package">
         <echo>making package...</echo>
-        <tar destfile="site.tar.gz" compression="gzip">
+        <tar destfile="${archiveFilename}" compression="gzip">
             <tarfileset dir="${basedir}/src" filemode="775" dirmode="775">
                 <include name="**/*"/>
                 <exclude name="**/.idea"/>
@@ -86,7 +90,7 @@
 
     <target name="remove-package">
         <echo>remove package...</echo>
-        <delete file="site.tar.gz"/>
+        <delete file="${archiveFilename}"/>
     </target>
 
 
@@ -130,7 +134,7 @@
                  trust="true"
                  command="tar -zxf ${ExecutionFolder}/${archiveFilename} -C ${ExecutionFolder}/"/>
     </target>
-    <target name="delete-package">
+    <target name="delete-remote-package">
         <echo>Delete package on ${env} ...</echo>
         <sshexec host="${Host}"
                  username="${User}"
