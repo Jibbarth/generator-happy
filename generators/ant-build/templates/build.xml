@@ -30,6 +30,8 @@
         <antcall target="remove-package"/>
         <antcall target="unpack"/>
         <antcall target="delete-package"/>
+        <% if (type == 'prestashop') { %><antcall target="remove-cache-prestashop" /><% } %>
+
     </target>
 
     <target name="deploy-local">
@@ -138,4 +140,19 @@
                  command="rm ${ExecutionFolder}/${archiveFilename}"/>
     </target>
 
+<% if (type == 'prestashop') { %>
+    <target name="remove-cache-prestashop">
+        <property file="build.properties.local"/>
+        <property name="env" value="local"/>
+        <echo>Clearing dev cache...</echo>
+        <sshexec
+            host="${Host}"
+            username="${User}"
+            password="${Password}"
+            verbose="false"
+            trust="true"
+            command="rm -rf ${ExecutionFolder}/{${firstCacheFolder},${secondCacheFolder},${firstCacheFile}}"
+        />
+    </target>
+<% }%>
 </project>

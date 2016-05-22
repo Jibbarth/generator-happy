@@ -15,9 +15,9 @@ module.exports = yeoman.generators.Base.extend({
     var subTypeAnt = [
       {name:"Base Ant build", value:'default'},
       {name:"Ant build for prestashop", value:'prestashop'},
-      {name:"Ant build for prestamodule", value:'prestamodule'},
+      //{name:"Ant build for prestamodule", value:'prestamodule'},
       {name:"Ant build for Symfony", value:'symfony'},
-      {name:"Ant build for Haxe project", value:'haxe'},
+      //{name:"Ant build for Haxe project", value:'haxe'},
     ];
 
     var subBuildProperties = [
@@ -194,6 +194,7 @@ module.exports = yeoman.generators.Base.extend({
       {
         projectName: this.projectName,
         branchVerification: this.branchVerification,
+        type: this.antType,
       }
     );
     // COPY BUILD.PROPERTIES
@@ -202,6 +203,7 @@ module.exports = yeoman.generators.Base.extend({
       this.destinationPath('build.properties'),
       {
         props: this.globalProperties,
+        type: this.antType,
       }
     );
   },
