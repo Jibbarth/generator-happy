@@ -1,12 +1,12 @@
 {
   "name": "generator-happy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Build happy project",
-  "homepage": "",
+  "homepage": "https://github.com/Microclimat/generator-happy",
   "author": {
     "name": "Jibbarth",
     "email": "barth.jib@mail.com",
-    "url": ""
+    "url": "http://happy-technologies.com"
   },
   "files": [
     "generators"
