@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="happy-build">
+
+    <target name="deploy">
+        <echo>Begin deploy on ${env}.</echo>
+        <echo>DeployDir ${deployDir}.</echo>
+        <echo>SourceDir ${sourceDir}.</echo>
+        <echo>archiveFileName ${archiveFilename}.</echo>
+        <echo>${env} host : ${Host}.</echo>
+        <echo>${env} User : ${User}.</echo>
+        <echo>${env} Password : ${Password}.</echo>
+        <echo>${env} ExecutionFolder : ${ExecutionFolder}.</echo>
+<% if (branchVerification) { %>
+        <echo>${env} Branch : ${branch}.</echo>
+        <exec executable="git" outputproperty="branchName"
+              failifexecutionfails="false">
+            <arg line="rev-parse --abbrev-ref HEAD" />
+        </exec>
+        <condition property="isOnValidBranch">
+            <matches pattern="${branch}" string="${branchName}"/>
+        </condition>
+        <fail message="You are not on ${branch} branch. Are you really sure you are ready for deploy ${env} ??" unless="isOnValidBranch"/>
+<% } %>
+        <antcall target="package"/>
+        <antcall target="upload"/>
+        <antcall target="upload-1.9"/>
+        <antcall target="remove-package"/>
+        <antcall target="unpack"/>
+        <antcall target="delete-remote-package"/>
+        <% if (type == 'prestashop') { %><antcall target="remove-cache-prestashop" /><% } %>
+<% if (type == 'symfony') { %>
+        <antcall target="copy-parameter"/>
+        <antcall target="assets"/>
+        <antcall target="assetic"/>
+        <antcall target="remove-cache-dev"/>
+        <antcall target="remove-cache-prod"/>
+        <antcall target="sql-dump"/>
+<% } %>
+    </target>
+
+    <target name="package">
+        <echo>making package...</echo>
+        <tar destfile="${archiveFilename}" compression="gzip">
+            <tarfileset dir="${basedir}/src" filemode="775" dirmode="775">
+                <include name="**/*"/>
+                <exclude name="**/.idea"/>
+                <exclude name="**/.idea/**"/>
+                <exclude name="**/.git"/>
+                <exclude name="**/.git/**"/>
+                <exclude name="**/.sass-cache/**"/>
+                <exclude name="${archiveFilename}"/>
+<% if (type == 'symfony') { %>
+                <exclude name="**/app/config/parameters.yml"/>
+                <exclude name="**/ui/**"/>
+                <exclude name="vendor/**"/>
+                <exclude name="**/web/bundle/**"/>
+<% } %>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="remove-package">
+        <echo>remove package...</echo>
+        <delete file="${archiveFilename}"/>
+    </target>
+
+    <target name="upload" unless="${AntVersion19}">
+        <echo>Uploading on ${env}...</echo>
+        <scp file="${archiveFilename}" todir="${User}@${Host}:${ExecutionFolder}"
+             password="${Password}"
+             verbose="false" sftp="true"
+             trust="true"/>
+    </target>
+
+    <target name="upload-1.9" if="${AntVersion19}">
+        <echo>Uploading (with ant 1.9 fix) on ${env}...</echo>
+        <scp file="${archiveFilename}" todir="${User}@${Host}:${ExecutionFolder}"
+             password="${Password}"
+             verbose="false" sftp="true"
+             dirmode="775"
+             filemode="775"
+             trust="true"/>
+    </target>
+
+    <target name="unpack">
+        <echo>Unpack package on ${env}...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="tar -zxf ${ExecutionFolder}/${archiveFilename} -C ${ExecutionFolder}/"/>
+    </target>
+
+    <target name="delete-remote-package">
+        <echo>Delete package on ${env} ...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="rm ${ExecutionFolder}/${archiveFilename}"/>
+    </target>
+
+<% if (type == 'prestashop') { %>
+    <target name="remove-cache-prestashop">
+        <echo>Clearing cache...</echo>
+        <sshexec
+            host="${Host}"
+            username="${User}"
+            password="${Password}"
+            verbose="false"
+            trust="true"
+            command="rm -rf ${ExecutionFolder}/{${firstCacheFolder},${secondCacheFolder},${firstCacheFile}}"
+        />
+    </target>
+<% }%>
+
+<% if (type == 'symfony') { %>
+    <target name="copy-parameter">
+        <echo>Set parameters ...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="cp ${ExecutionFolder}/app/config/parameters_${env}.yml ${ExecutionFolder}/app/config/parameters.yml"/>
+    </target>
+
+    <target name="remove-cache-dev">
+        <echo>Remove dev cache on ${env}...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console cache:clear --env=dev"/>
+    </target>
+
+    <target name="remove-cache-prod">
+        <echo>Remove prod cache on ${env}...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console cache:clear --env=prod"/>
+    </target>
+
+    <target name="sql-dump">
+        <echo>Dump SQL </echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console doctrine:schema:update --dump-sql"/>
+    </target>
+
+    <target name="sql-update">
+        <echo>Update SQL </echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console doctrine:schema:update --force"/>
+    </target>
+
+    <target name="assets">
+        <echo>Create assets on ${env}</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console assets:install --symlink ${ExecutionFolder}/web"/>
+    </target>
+
+    <target name="assetic">
+        <echo>Generate assetic on ${env}</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="php ${ExecutionFolder}/app/console assetic:dump --env=dev"/>
+    </target>
+<% }%>
+
+</project>
