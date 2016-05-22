@@ -136,7 +136,7 @@ module.exports = yeoman.generators.Base.extend({
        this.templatePath('dummyfile.txt'),
        this.destinationPath('dummyfile.txt')
     );*/
-
+    // COPY BUILD.PROPERTIES.ENV
     if(this.propertiesWanted.length > 0) {
       for (var i = 0; i < this.propertiesWanted.length; i++) {
         this.fs.copyTpl(
@@ -150,6 +150,16 @@ module.exports = yeoman.generators.Base.extend({
         );
       }
     }
+
+    // COPY BUILD.XML
+    this.fs.copyTpl(
+      this.templatePath('build.xml'),
+      this.destinationPath('build.xml'),
+      {
+        projectName: this.projectName,
+        branchVerification: this.branchVerification,
+      }
+    );
   },
 
   install: function () {
