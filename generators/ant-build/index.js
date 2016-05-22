@@ -26,7 +26,14 @@ module.exports = yeoman.generators.Base.extend({
         {name: "Recette", value :'recette', checked:false},
         {name: "Prod", value :'prod', checked:true},
     ]
-    var prompts = [{
+    var prompts = [
+    {
+        type: 'input',
+        name: 'projectName',
+        message: 'What is your project name ?',
+        default: this.appname
+    },
+    {
         type: 'list',
         name: 'antChoice',
         message:'What kind of build.xml you want',
@@ -38,12 +45,20 @@ module.exports = yeoman.generators.Base.extend({
         name:'buildproperties',
         message: 'What kind of build.properties do you want ?',
         choices: subBuildProperties,
+    },
+    {
+        type:'confirm',
+        name: 'branchVerification',
+        message:'Do you want limit your deploy task to a single branch ?',
+        default: true,
     }
     ];
 
     this.prompt(prompts, function (props) {
       this.antType = props.antChoice;
       this.propertiesWanted = props.buildproperties;
+      this.projectName = props.projectName;
+      this.branchVerification = props.branchVerification;
       this.log(chalk.blue('\n\nOkay. I guess you use ssh for deploy in your differents environment so..'));
       this.buildproperties = [];
       this._ask_build_env(this.propertiesWanted, 0);
@@ -81,6 +96,15 @@ module.exports = yeoman.generators.Base.extend({
         default: '/var/www/html'
       },
     ];
+    // Prompt for branchName
+    if (this.branchVerification) {
+        prompts.push({
+            type:'input',
+            name:'Branch',
+            message: 'Which branch must be allowed for deploy on ' + env + '?',
+            default: 'develop'
+        });
+    }
 
     this.prompt(prompts, function (props) {
       this.buildproperties[env] = props;
@@ -108,10 +132,10 @@ module.exports = yeoman.generators.Base.extend({
     this.log("Let's go for haxe ant build");
   },
   writing: function () {
-    this.fs.copy(
+    /*this.fs.copy(
        this.templatePath('dummyfile.txt'),
        this.destinationPath('dummyfile.txt')
-    );
+    );*/
 
     if(this.propertiesWanted.length > 0) {
       for (var i = 0; i < this.propertiesWanted.length; i++) {
@@ -121,6 +145,7 @@ module.exports = yeoman.generators.Base.extend({
           {
             env : this.propertiesWanted[i],
             envValue: this.buildproperties[this.propertiesWanted[i]],
+            branchVerification: this.branchVerification,
           }
         );
       }
