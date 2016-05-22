@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project basedir="." name="<%= projectName %>" default="deploy-local" >
+
+    <property file="build.properties"/>
+    <property file="build.properties.${env}"/>
+
+    <target name="deploy">
+        <echo>Begin deploy on ${env}.</echo>
+        <echo>DeployDir ${deployDir}.</echo>
+        <echo>SourceDir ${sourceDir}.</echo>
+        <echo>archiveFileName ${archiveFilename}.</echo>
+        <echo>${env} host : ${Host}.</echo>
+        <echo>${env} User : ${User}.</echo>
+        <echo>${env} Password : ${Password}.</echo>
+        <echo>${env} ExecutionFolder : ${ExecutionFolder}.</echo>
+        <echo>${env} Branch : ${branch}.</echo>
+
+        <exec executable="git" outputproperty="branchName"
+              failifexecutionfails="false">
+            <arg line="rev-parse --abbrev-ref HEAD" />
+        </exec>
+        <condition property="isOnValidBranch">
+            <matches pattern="${branch}" string="${branchName}"/>
+        </condition>
+        <fail message="You are not on ${branch} branch. Are you really sure you are ready for deploy ${env} ??" unless="isOnValidBranch"/>
+
+        <antcall target="package"/>
+        <antcall target="upload"/>
+        <antcall target="upload-1.9"/>
+        <antcall target="remove-package"/>
+        <antcall target="unpack"/>
+        <antcall target="delete-package"/>
+    </target>
+
+    <target name="deploy-local">
+        <property name="env" value="local"/>
+        <property file="build.properties.${env}"/>
+        <copy todir="${deployDir}" overwrite="false" preservelastmodified="true">
+            <fileset dir="${basedir}/src">
+                <include name="**/*"/>
+                <exclude name="site.tar.gz"/>
+            </fileset>
+        </copy>
+        <condition property="isVm">
+            <isreachable url="http://${Host}" timeout="2"/>
+        </condition>
+        <fail message="You don't use vm or it's not launched." unless="isVm"/>
+        <antcall target="sync-vm"></antcall>
+    </target>
+
+    <target name="deploy-preprod">
+        <property name="env" value="preprod"/>
+        <property file="build.properties.${env}"/>
+        <antcall target="deploy"></antcall>
+
+    </target>
+
+    <target name="deploy-recette">
+        <property name="env" value="recette"/>
+        <property file="build.properties.${env}"/>
+        <antcall target="deploy"></antcall>
+    </target>
+
+    <target name="deploy-prod">
+        <property name="env" value="prod"/>
+        <property file="build.properties.${env}"/>
+        <antcall target="deploy"></antcall>
+    </target>
+
+    <target name="package">
+        <echo>making package...</echo>
+        <tar destfile="site.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}/src" filemode="775" dirmode="775">
+                <include name="**/*"/>
+                <exclude name="**/.idea"/>
+                <exclude name="**/.idea/**"/>
+                <exclude name="**/.git"/>
+                <exclude name="**/.git/**"/>
+                <exclude name="**/.sass-cache/**"/>
+                <exclude name="${archiveFilename}"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="remove-package">
+        <echo>remove package...</echo>
+        <delete file="site.tar.gz"/>
+    </target>
+
+
+    <target name="sync-vm">
+        <property file="build.properties.local"/>
+        <property name="env" value="local"/>
+        <echo>Synchronizing files...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="rsync -Pa --exclude=**/bin --exclude=**.log --exclude=**.hx --update /home/happy/html/ /var/www/html" >
+        </sshexec>
+    </target>
+
+    <target name="upload" unless="${AntVersion19}">
+        <echo>Uploading on ${env}...</echo>
+        <scp file="${archiveFilename}" todir="${User}@${Host}:${ExecutionFolder}"
+             password="${Password}"
+             verbose="false" sftp="true"
+             trust="true"/>
+    </target>
+
+    <target name="upload-1.9" if="${AntVersion19}">
+        <echo>Uploading (with ant 1.9 fix) on ${env}...</echo>
+        <scp file="${archiveFilename}" todir="${User}@${Host}:${ExecutionFolder}"
+             password="${Password}"
+             verbose="false" sftp="true"
+             dirmode="775"
+             filemode="775"
+             trust="true"/>
+    </target>
+
+    <target name="unpack">
+        <echo>Unpack package on ${env}...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="tar -zxf ${ExecutionFolder}/${archiveFilename} -C ${ExecutionFolder}/"/>
+    </target>
+    <target name="delete-package">
+        <echo>Delete package on ${env} ...</echo>
+        <sshexec host="${Host}"
+                 username="${User}"
+                 password="${Password}"
+                 verbose="false"
+                 trust="true"
+                 command="rm ${ExecutionFolder}/${archiveFilename}"/>
+    </target>
+
+</project>
