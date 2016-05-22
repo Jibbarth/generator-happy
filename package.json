@@ -11,10 +11,17 @@
   "files": [
     "generators"
   ],
-  "main": "generators\\index.js",
+  "main": "generators\\app\\index.js",
   "keywords": [
-    "",
-    "yeoman-generator"
+    "yeoman",
+    "yeoman-generator",
+    "generator",
+    "ant",
+    "build",
+    "happy",
+    "prestashop",
+    "module",
+    "symfony"
   ],
   "dependencies": {
     "yeoman-generator": "^0.21.1",
@@ -40,7 +47,7 @@
       "mocha": true
     }
   },
-  "repository": "Jibbarth/generator-happy",
+  "repository": "Microclimat/generator-happy",
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp"
