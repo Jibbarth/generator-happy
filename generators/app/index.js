@@ -15,8 +15,8 @@ module.exports = yeoman.generators.Base.extend({
 
     var subgeneratorList = [
       {name:"An awesome prestashop module", value:'prestamodule'},
-      {name:"Start a new prestashop project "+ chalk.yellow('- this is not yet available, submit a PR -'), value:'prestasite'},
       {name:"Construct an awesome build.xml for ant tasks", value:'ant-build'},
+      {name:"Start a new prestashop project "+ chalk.yellow('- this is not yet available, submit a PR -'), value:'prestasite'},
     ];
     var prompts = [{
       type: 'list',

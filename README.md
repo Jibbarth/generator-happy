@@ -14,13 +14,23 @@ npm install -g yo
 
 Then, clone this repo (until i publish it on npm) and
 ```
+npm install
 npm link
 ```
 
-Then generate your new project:
 
-```bash
+## Usage
+
+You don't know what to do ? Create your project folder and begin with
+```
 yo happy
+```
+
+## List of command
+
+```
+yo happy:prestamodule
+yo happy:ant-build
 ```
 
 ## Getting To Know Yeoman
@@ -30,7 +40,6 @@ Yeoman has a heart of gold. He&#39;s a person with feelings and opinions, but he
 ## License
 
 MIT © [Jibbarth]()
-
 
 [npm-image]: https://badge.fury.io/js/generator-happy.svg
 [npm-url]: https://npmjs.org/package/generator-happy
