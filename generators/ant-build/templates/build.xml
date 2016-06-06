@@ -31,8 +31,8 @@
         <antcall target="deploy"></antcall>
     </target>
 <% } %>
-<% if(aEnv.indexOf('recette') > -1 ) { %>
-    <target name="deploy-recette">
+<% if(aEnv.indexOf('qualif') > -1 ) { %>
+    <target name="deploy-qualif">
         <property name="env" value="recette"/>
         <property file="build.properties.${env}"/>
         <antcall target="deploy"></antcall>

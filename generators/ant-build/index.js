@@ -21,8 +21,8 @@ module.exports = yeoman.generators.Base.extend({
 
     var subBuildProperties = [
         {name: "Local", value :'local', checked:true},
+        {name: "Qualif", value :'qualif', checked:false},
         {name: "Preprod", value :'preprod', checked:true},
-        {name: "Recette", value :'recette', checked:false},
         {name: "Prod", value :'prod', checked:true},
     ]
     var prompts = [
