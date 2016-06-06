@@ -104,7 +104,7 @@ class <%= moduleName %> extends Module
         ));
 
         // Finally, display smarty template
-        return $this->display(__FILE__, 'views/templates/admin/configure.tpl', $this->getCacheId());
+        return $this->display(__FILE__, 'views/templates/admin/configure.tpl');
     }
 
     /**
